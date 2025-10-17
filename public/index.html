@@ -5,326 +5,305 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Botpress Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-
-        .chat-container {
-            width: 100vw;
-            max-width: 100vw;
-            height: 100vh;
-            background: white;
-            border-radius: 0;
-            box-shadow: none;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Dark theme for chat container */
-        body.theme-dark .chat-container {
-            background: #1f2937;
-        }
-
-        .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            word-wrap: break-word;
-            animation: slideIn 0.3s ease;
-        }
-
         @keyframes slideIn {
             from {
                 opacity: 0;
                 transform: translateY(10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .message.user {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 4px;
+        .message {
+            animation: slideIn 0.3s ease;
         }
 
-        .message.bot {
-            align-self: flex-start;
-            background: #f0f0f0;
-            color: #333;
-            border-bottom-left-radius: 4px;
-        }
-
-        /* Dark theme message styling */
-        body.theme-dark .message.bot {
-            background: #374151;
-            color: #e5e7eb;
-        }
-
-        body.theme-dark .message.user {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
-        }
-
-
-        /* Code block styling */
         .code-block {
-            background: #0f172a;
-            color: #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 14px;
-            overflow-x: auto;
-            margin-top: 8px;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: #1d1f21 !important;
+            border-radius: 0.5rem;
+            margin: 0;
         }
-        .code-label {
-            display: inline-block;
-            font-size: 11px;
-            color: #94a3b8;
-            margin-bottom: 6px;
-            background: rgba(148,163,184,0.12);
-            border-radius: 6px;
-            padding: 2px 8px;
-        }
-        .code-wrapper { position: relative; }
-        .copy-btn {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            font-size: 12px;
-            color: #cbd5e1;
-            background: transparent;
-            border: 1px solid rgba(203,213,225,0.25);
-            border-radius: 6px;
-            padding: 2px 6px;
-            cursor: pointer;
-        }
-        .copy-btn:hover { background: rgba(203,213,225,0.1); }
+
         .inline-code {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            background: #f1f5f9;
-            color: #0f172a;
-            padding: 1px 4px;
-            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
         }
 
-        .message-options {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
+        /* Prism theme overrides for better VS Code look */
+        pre[class*="language-"] {
+            background: #1d1f21 !important;
+            margin: 0 !important;
+            padding: 1rem !important;
+            border-radius: 0.5rem;
+            overflow-x: auto;
         }
 
-        .option-btn {
-            padding: 10px;
-            background: white;
-            border: 2px solid #667eea;
-            color: #667eea;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
+        code[class*="language-"] {
+            background: transparent !important;
+            color: #c5c8c6 !important;
+            text-shadow: none !important;
+            font-size: 0.875rem;
+            line-height: 1.6;
         }
 
-        .option-btn:hover {
-            background: #667eea;
-            color: white;
+        .token.comment {
+            color: #969896 !important;
+            font-style: italic;
         }
 
-        .chat-input-container {
-            padding: 20px;
-            background: #f9f9f9;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            gap: 10px;
+        .token.keyword {
+            color: #cc6666 !important;
         }
 
-        /* Dark theme input styling */
-        body.theme-dark .chat-input-container {
-            background: #374151;
-            border-top-color: #4b5563;
+        .token.string {
+            color: #b5bd68 !important;
         }
 
-        #messageInput {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: border 0.3s;
+        .token.number {
+            color: #de935f !important;
         }
 
-        #messageInput:focus {
-            border-color: #667eea;
+        .token.function {
+            color: #81a2be !important;
         }
 
-        /* Dark theme input field */
-        body.theme-dark #messageInput {
-            background: #1f2937;
-            color: #e5e7eb;
-            border-color: #4b5563;
+        .token.class-name {
+            color: #f0c674 !important;
         }
 
-        body.theme-dark #messageInput:focus {
-            border-color: #6366f1;
+        .token.operator {
+            color: #8abeb7 !important;
         }
 
-        #sendBtn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.2s;
+        .token.punctuation {
+            color: #c5c8c6 !important;
         }
 
-        #sendBtn:hover {
-            transform: scale(1.05);
+        .token.property {
+            color: #b294bb !important;
         }
 
-        #sendBtn:active {
-            transform: scale(0.95);
+        .token.tag {
+            color: #cc6666 !important;
         }
 
-        .status {
-            padding: 8px 16px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            background: #f0f0f0;
+        .token.attr-name {
+            color: #de935f !important;
         }
 
-        .status.connected {
-            background: #d4edda;
-            color: #155724;
+        .token.attr-value {
+            color: #b5bd68 !important;
         }
 
-        /* Dark theme status */
-        body.theme-dark .status {
-            background: #374151;
-            color: #9ca3af;
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .chat-container {
+                height: 100vh !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .header-mobile {
+                padding: 1rem !important;
+            }
+            
+            .header-title {
+                font-size: 1rem !important;
+            }
+            
+            .header-subtitle {
+                font-size: 0.75rem !important;
+            }
+            
+            .status-mobile {
+                padding: 0.5rem 1rem !important;
+            }
+            
+            .messages-mobile {
+                padding: 1rem !important;
+            }
+            
+            .input-mobile {
+                padding: 1rem !important;
+                flex-direction: column !important;
+                gap: 0.75rem !important;
+            }
+            
+            .input-field-mobile {
+                width: 100% !important;
+                padding: 0.875rem !important;
+                font-size: 16px !important; /* Prevents zoom on iOS */
+            }
+            
+            .send-btn-mobile {
+                width: 100% !important;
+                padding: 0.875rem !important;
+                font-size: 1rem !important;
+            }
+            
+            .message-bubble-mobile {
+                max-width: 90% !important;
+                padding: 0.75rem 1rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .code-header-mobile {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
+            
+            .code-content-mobile {
+                padding: 0.75rem !important;
+                font-size: 0.8rem !important;
+            }
         }
 
-        body.theme-dark .status.connected {
-            background: #065f46;
-            color: #10b981;
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .chat-container {
+                height: 80vh !important;
+                max-height: 800px !important;
+            }
+            
+            .message-bubble-tablet {
+                max-width: 80% !important;
+            }
         }
 
-        /* Theme toggle button */
-        #themeToggle {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            border: 2px solid rgba(0,0,0,0.1);
-            background: white;
-            color: #333;
-            border-radius: 999px;
-            width: 38px;
-            height: 38px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        body.theme-dark #themeToggle {
-            background: #111827;
-            color: #e5e7eb;
-            border-color: rgba(255,255,255,0.12);
+        @media (min-width: 1025px) {
+            .chat-container {
+                height: 85vh !important;
+                max-height: 900px !important;
+            }
+            
+            .message-bubble-desktop {
+                max-width: 70% !important;
+            }
         }
 
-        /* Background themes */
-        body.theme-light {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        body.theme-dark {
-            background: #0b1220;
+        /* Touch-friendly buttons for mobile */
+        @media (max-width: 640px) {
+            button {
+                min-height: 44px; /* iOS touch target minimum */
+            }
+            
+            .option-btn-mobile {
+                padding: 0.75rem 1rem !important;
+                font-size: 0.875rem !important;
+                min-height: 44px !important;
+            }
         }
     </style>
 </head>
 
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            🤖 Botpress Chat
-        </div>
-        <button id="themeToggle" aria-label="Toggle theme">🌙</button>
-        <div class="status" id="status">Connecting...</div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input-container">
-            <input type="text" id="messageInput" placeholder="Type your message..." />
-            <button id="sendBtn">Send</button>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+    <div class="w-full max-w-4xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col transition-colors duration-300"
+            style="height: 85vh; max-height: 900px;">
+
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-2xl">
+                        🤖
+                    </div>
+                    <div>
+                        <h1 class="text-white font-semibold text-lg">Botpress Assistant</h1>
+                        <p class="text-indigo-100 text-xs" id="statusText">Connecting...</p>
+                    </div>
+                </div>
+                <button id="themeToggle"
+                    class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center text-white text-lg"
+                    aria-label="Toggle theme">
+                    🌙
+                </button>
+            </div>
+
+            <!-- Status Bar -->
+            <div id="status"
+                class="px-6 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                    <span>Initializing connection...</span>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="chatMessages"
+                class="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-4 bg-gray-50/50 dark:bg-gray-900/50">
+                <!-- Messages will appear here -->
+            </div>
+
+            <!-- Input Container -->
+            <div class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 sm:px-6 py-4">
+                <div class="flex gap-3">
+                    <input type="text" id="messageInput" placeholder="Type your message..."
+                        class="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all" />
+                    <button id="sendBtn"
+                        class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                        <span class="hidden sm:inline">Send</span>
+                        <span class="sm:hidden">📤</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Same-origin API base - works locally and on Vercel
         const API_URL = window.location.origin;
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const status = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
 
         // Theme setup
         (function setupTheme() {
+            const body = document.body;
             const saved = localStorage.getItem('theme') || 'light';
-            document.body.classList.toggle('theme-dark', saved === 'dark');
-            document.body.classList.toggle('theme-light', saved !== 'dark');
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    body.style.background = '#0f172a';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    body.style.background = 'linear-gradient(135deg, rgb(238 242 255) 0%, rgb(255 255 255) 50%, rgb(250 245 255) 100%)';
+                }
+            }
+
+            applyTheme(saved);
+
             const btn = document.getElementById('themeToggle');
-            const setIcon = () => { btn.textContent = document.body.classList.contains('theme-dark') ? '☀️' : '🌙'; };
-            setIcon();
+            const updateIcon = () => {
+                btn.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+            };
+            updateIcon();
+
             btn.addEventListener('click', () => {
-                const isDark = document.body.classList.toggle('theme-dark');
-                document.body.classList.toggle('theme-light', !isDark);
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                setIcon();
+                const isDark = document.documentElement.classList.contains('dark');
+                const newTheme = isDark ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateIcon();
             });
         })();
 
-        // Initialize the chat
         async function initializeChat() {
             const seenMessageIds = new Set();
 
@@ -338,42 +317,43 @@
                     for (const msg of messages) {
                         if (!msg || !msg.id || seenMessageIds.has(msg.id)) continue;
                         seenMessageIds.add(msg.id);
-                        // Only render bot messages with text payloads
                         if (msg.payload && msg.payload.type === 'text' && msg.direction !== 'outgoing') {
                             addBotMessage(msg.payload);
                         }
                     }
 
-                    status.textContent = '✅ Connected';
-                    status.className = 'status connected';
+                    status.innerHTML = `
+                        <div class="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span>Connected</span>
+                        </div>
+                    `;
+                    statusText.textContent = 'Online';
                 } catch (err) {
                     console.error('Polling error:', err);
-                    status.textContent = '❌ Disconnected';
-                    status.className = 'status';
+                    status.innerHTML = `
+                        <div class="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                            <span>Disconnected</span>
+                        </div>
+                    `;
+                    statusText.textContent = 'Offline';
                 }
             }
 
-            // Start polling
             await pollMessages();
             setInterval(pollMessages, 2000);
 
-            // Send message function
             async function sendMessage(text) {
                 if (!text.trim()) return;
 
-                // Add user message to chat
                 addUserMessage(text);
-
-                // Clear input
                 messageInput.value = '';
 
-                // Send to backend
                 try {
                     const response = await fetch(`${API_URL}/api/send-message`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: text })
                     });
 
@@ -386,49 +366,51 @@
                 }
             }
 
-            // Add user message to chat
             function addUserMessage(text) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = 'message user';
-                messageDiv.textContent = text;
+                messageDiv.className = 'message flex justify-end';
+                messageDiv.innerHTML = `
+                    <div class="max-w-[85%] sm:max-w-[75%] lg:max-w-[70%] px-4 py-3 rounded-2xl rounded-br-sm bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md">
+                        <p class="text-sm sm:text-base leading-relaxed">${escapeHtml(text)}</p>
+                    </div>
+                `;
                 chatMessages.appendChild(messageDiv);
                 scrollToBottom();
             }
 
-            // Add bot message to chat
             function addBotMessage(payload) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = 'message bot';
-                renderTextAndCode(messageDiv, payload.text || '');
+                messageDiv.className = 'message w-full';
 
-                // Add options/buttons if present
+                const bubble = document.createElement('div');
+                bubble.className = 'w-full px-4 py-3 bg-transparent text-gray-900 dark:text-gray-100';
+
+                renderTextAndCode(bubble, payload.text || '');
+
                 if (payload.type === 'choice' && payload.options) {
                     const optionsDiv = document.createElement('div');
-                    optionsDiv.className = 'message-options';
+                    optionsDiv.className = 'flex flex-col gap-2 mt-3';
 
                     payload.options.forEach(option => {
                         const btn = document.createElement('button');
-                        btn.className = 'option-btn';
+                        btn.className = 'px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 rounded-lg transition-colors';
                         btn.textContent = option.label;
                         btn.onclick = () => sendMessage(option.value);
                         optionsDiv.appendChild(btn);
                     });
 
-                    messageDiv.appendChild(optionsDiv);
+                    bubble.appendChild(optionsDiv);
                 }
 
+                messageDiv.appendChild(bubble);
                 chatMessages.appendChild(messageDiv);
                 scrollToBottom();
             }
 
-            // Render helper: split fenced code blocks from text and render separately
             function renderTextAndCode(container, text) {
-                if (!text) {
-                    return;
-                }
+                if (!text) return;
 
                 const segments = [];
-                // Support ```lang or ``` lang (with spaces), capture optional language tokens with + or - as well
                 const regex = /```[ \t]*([\w+-]*)[ \t]*\r?\n([\s\S]*?)```/g;
                 let lastIndex = 0;
                 let match;
@@ -436,7 +418,6 @@
                 while ((match = regex.exec(text)) !== null) {
                     const [full, langRaw, code] = match;
                     const lang = (langRaw || '').toLowerCase();
-                    // preceding text
                     if (match.index > lastIndex) {
                         segments.push({ type: 'text', content: text.slice(lastIndex, match.index) });
                     }
@@ -444,7 +425,6 @@
                     lastIndex = match.index + full.length;
                 }
 
-                // trailing text
                 if (lastIndex < text.length) {
                     segments.push({ type: 'text', content: text.slice(lastIndex) });
                 }
@@ -452,41 +432,81 @@
                 for (const seg of segments) {
                     if (seg.type === 'text') {
                         const p = document.createElement('div');
+                        p.className = 'text-sm sm:text-base leading-relaxed';
                         renderInlineCode(p, seg.content.trim());
                         if (p.textContent || p.childNodes.length) container.appendChild(p);
                     } else if (seg.type === 'code') {
                         const wrapper = document.createElement('div');
-                        wrapper.className = 'code-wrapper';
-                        // Optional label
-                        if (seg.lang) {
-                            const label = document.createElement('div');
-                            label.className = 'code-label';
-                            label.textContent = seg.lang;
-                            wrapper.appendChild(label);
-                        }
-                        const pre = document.createElement('pre');
-                        pre.className = 'code-block';
-                        pre.textContent = seg.content.replace(/^\n+|\n+$/g, '');
+                        wrapper.className = 'relative mt-3 rounded-lg overflow-hidden bg-[#1d1f21] shadow-lg';
+
+                        // Header with language label and copy button
+                        const header = document.createElement('div');
+                        header.className = 'flex items-center justify-between px-4 py-2.5 bg-[#282a2e] border-b border-[#373b41]';
+
+                        const label = document.createElement('div');
+                        label.className = 'text-xs font-semibold text-gray-300 uppercase tracking-wide';
+                        label.textContent = seg.lang || 'plaintext';
+
                         const btn = document.createElement('button');
-                        btn.className = 'copy-btn';
-                        btn.textContent = 'Copy';
+                        btn.className = 'px-3 py-1 text-xs text-gray-300 hover:text-white hover:bg-[#373b41] rounded transition-all flex items-center gap-1.5';
+                        btn.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>Copy</span>';
+
+                        header.appendChild(label);
+                        header.appendChild(btn);
+                        wrapper.appendChild(header);
+
+                        // Code block with syntax highlighting using Prism
+                        const pre = document.createElement('pre');
+                        const code = document.createElement('code');
+
+                        const cleanCode = seg.content.replace(/^\n+|\n+$/g, '');
+                        code.textContent = cleanCode;
+
+                        // Map common language aliases to Prism language names
+                        const languageMap = {
+                            'js': 'javascript',
+                            'jsx': 'jsx',
+                            'ts': 'typescript',
+                            'tsx': 'typescript',
+                            'py': 'python',
+                            'html': 'markup',
+                            'xml': 'markup',
+                            'sh': 'bash',
+                            'shell': 'bash'
+                        };
+
+                        const langName = languageMap[seg.lang] || seg.lang || 'javascript';
+
+                        // Apply language class for Prism
+                        code.className = `language-${langName}`;
+                        pre.className = 'code-block';
+
+                        pre.appendChild(code);
+
+                        // Apply Prism syntax highlighting
+                        if (window.Prism) {
+                            Prism.highlightElement(code);
+                        }
+
+                        // Copy button functionality
                         btn.addEventListener('click', async () => {
                             try {
-                                await navigator.clipboard.writeText(pre.textContent);
-                                btn.textContent = 'Copied!';
-                                setTimeout(() => (btn.textContent = 'Copy'), 1200);
-                            } catch (_) {
-                                // no-op
-                            }
+                                await navigator.clipboard.writeText(cleanCode);
+                                btn.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copied!</span>';
+                                btn.classList.add('text-green-400');
+                                setTimeout(() => {
+                                    btn.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>Copy</span>';
+                                    btn.classList.remove('text-green-400');
+                                }, 1200);
+                            } catch (_) { }
                         });
-                        wrapper.appendChild(btn);
+
                         wrapper.appendChild(pre);
                         container.appendChild(wrapper);
                     }
                 }
             }
 
-            // Render inline `code` within a text block, and apply **bold** formatting
             function renderInlineCode(parent, text) {
                 const parts = [];
                 const inline = /`([^`]+)`/g;
@@ -510,25 +530,24 @@
                         parent.appendChild(span);
                     } else {
                         const code = document.createElement('code');
-                        code.className = 'inline-code';
+                        code.className = 'inline-code px-1.5 py-0.5 text-xs sm:text-sm bg-gray-100 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded';
                         code.textContent = p.v;
                         parent.appendChild(code);
                     }
                 }
             }
 
-            // Apply **bold** markdown to a text-only node (no code spans inside)
             function applyBoldFormatting(parent, text) {
                 const regex = /(\*\*[^*]+\*\*)/g;
                 let last = 0;
                 let match;
                 while ((match = regex.exec(text)) !== null) {
                     if (match.index > last) {
-                        const t = document.createTextNode(text.slice(last, match.index));
-                        parent.appendChild(t);
+                        parent.appendChild(document.createTextNode(text.slice(last, match.index)));
                     }
-                    const content = match[0].slice(2, -2); // remove ** **
+                    const content = match[0].slice(2, -2);
                     const strong = document.createElement('strong');
+                    strong.className = 'font-semibold';
                     strong.textContent = content;
                     parent.appendChild(strong);
                     last = match.index + match[0].length;
@@ -538,38 +557,36 @@
                 }
             }
 
-            // Add system message
             function addSystemMessage(text) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = 'message bot';
-                messageDiv.style.background = '#ffebee';
-                messageDiv.style.color = '#c62828';
-                messageDiv.textContent = text;
+                messageDiv.className = 'message flex justify-center';
+                messageDiv.innerHTML = `
+                    <div class="px-4 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
+                        ${escapeHtml(text)}
+                    </div>
+                `;
                 chatMessages.appendChild(messageDiv);
                 scrollToBottom();
             }
 
-            // Scroll to bottom
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
             function scrollToBottom() {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
-            // Event listeners
-            sendBtn.addEventListener('click', () => {
-                sendMessage(messageInput.value);
-            });
-
+            sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
             messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage(messageInput.value);
-                }
+                if (e.key === 'Enter') sendMessage(messageInput.value);
             });
 
-            // Focus input on load
             messageInput.focus();
         }
 
-        // Start the chat when page loads
         initializeChat();
     </script>
 </body>
